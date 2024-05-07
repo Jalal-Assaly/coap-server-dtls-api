@@ -26,8 +26,8 @@ import org.pacs.coapserverdtlsapi.models.AccessResponseModel;
 import org.pacs.coapserverdtlsapi.services.CoapService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -97,18 +97,19 @@ public class CoapDtlsServer {
             this.coapService = coapService;
         }
 
-        @Override
-        public void handleGET(CoapExchange exchange) {
-            Request request = exchange.advanced().getRequest();
-            System.out.println(Utils.prettyPrint(request));
-            exchange.respond(CoAP.ResponseCode.CONTENT, "Well received !", 0);
-        }
+//        @Override
+//        public void handleGET(CoapExchange exchange) {
+//            Request request = exchange.advanced().getRequest();
+//            System.out.println(Utils.prettyPrint(request));
+//            exchange.respond(CoAP.ResponseCode.CONTENT, "Well received !", 0);
+//        }
 
         @Override
-        public void handlePUT(CoapExchange exchange) {
+        public void handlePOST(CoapExchange exchange) {
 
             // Endpoint to be called
             String endpoint = "employee";
+            AccessResponseModel response;
 
             // Received request
             Request request = exchange.advanced().getRequest();
@@ -120,24 +121,24 @@ public class CoapDtlsServer {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 Map<String, Map<String, Object>> actualJson = objectMapper.readValue(payload, new TypeReference<>(){});
-                if (actualJson.get("userAttributes").get("role").equals("Visitor")) {
+                System.out.println(actualJson.get("UAT").get("RL"));
+                if (actualJson.get("UAT").get("RL").equals("Visitor")) {
                     endpoint = "visitor";
                 }
             } catch (IOException e) {
-                throw new RuntimeException("JSON deserialization exception");
+                response = new AccessResponseModel(false);
             }
 
             // Communicate with ABAC Model
-            AccessResponseModel response;
             try {
                 response = coapService.sendAccessRequest(endpoint, request.getPayloadString());
-            } catch (WebClientResponseException exception) {
+            } catch (WebClientResponseException | WebClientRequestException exception) {
                 response = new AccessResponseModel(false);
             }
 
             // Send response
-            ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String jsonResponse;
+            ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
             try {
                 jsonResponse = objectWriter.writeValueAsString(response);
             } catch (JsonProcessingException e) {

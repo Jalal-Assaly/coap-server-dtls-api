@@ -17,7 +17,7 @@ import java.util.List;
 public class CredentialsUtil {
 
 	// from ETSI Plugtest test spec
-	public static final String OPEN_PSK_IDENTITY = "Client_identity";
+	public static final String OPEN_PSK_IDENTITY = "AccessPoint";
 	public static final byte[] OPEN_PSK_SECRET = "secretPSK".getBytes();
 
 	public static void setupCredentials(DtlsConnectorConfig.Builder config) {
@@ -40,5 +40,4 @@ public class CredentialsUtil {
 		}
 		configuration.set(DtlsConfig.DTLS_PRESELECTED_CIPHER_SUITES, selectedCiphers);
 	}
-
 }
