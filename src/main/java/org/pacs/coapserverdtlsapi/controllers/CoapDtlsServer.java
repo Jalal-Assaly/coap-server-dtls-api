@@ -26,7 +26,6 @@ import org.pacs.coapserverdtlsapi.models.AccessResponseModel;
 import org.pacs.coapserverdtlsapi.services.CoapService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.io.File;
@@ -97,13 +96,6 @@ public class CoapDtlsServer {
             this.coapService = coapService;
         }
 
-//        @Override
-//        public void handleGET(CoapExchange exchange) {
-//            Request request = exchange.advanced().getRequest();
-//            System.out.println(Utils.prettyPrint(request));
-//            exchange.respond(CoAP.ResponseCode.CONTENT, "Well received !", 0);
-//        }
-
         @Override
         public void handlePOST(CoapExchange exchange) {
 
@@ -114,7 +106,6 @@ public class CoapDtlsServer {
             // Received request
             Request request = exchange.advanced().getRequest();
             System.out.println(Utils.prettyPrint(request));
-            System.out.println(request.getPayloadString());
 
             // Visitor or employee role
             byte[] payload = request.getPayload();
@@ -132,7 +123,7 @@ public class CoapDtlsServer {
             // Communicate with ABAC Model
             try {
                 response = coapService.sendAccessRequest(endpoint, request.getPayloadString());
-            } catch (WebClientResponseException | WebClientRequestException exception) {
+            } catch (WebClientResponseException exception) {
                 response = new AccessResponseModel(false);
             }
 
