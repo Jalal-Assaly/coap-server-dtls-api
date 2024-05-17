@@ -1,9 +1,9 @@
 package org.pacs.coapserverdtlsapi.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
@@ -29,9 +29,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -109,14 +107,13 @@ public class CoapDtlsServer {
 
             // Visitor or employee role
             byte[] payload = request.getPayload();
-            ObjectMapper objectMapper = new ObjectMapper();
             try {
-                Map<String, Map<String, Object>> actualJson = objectMapper.readValue(payload, new TypeReference<>(){});
-                System.out.println(actualJson.get("UAT").get("RL"));
-                if (actualJson.get("UAT").get("RL").equals("Visitor")) {
+                JsonObject actualJson = JsonParser.parseString(new String(payload)).getAsJsonObject();
+                if ("Visitor".equals(actualJson.get("UAT").getAsJsonObject().get("RL").getAsString())) {
+                    System.out.println("Found visitor");
                     endpoint = "visitor";
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 response = new AccessResponseModel(false);
             }
 
@@ -129,10 +126,10 @@ public class CoapDtlsServer {
 
             // Send response
             String jsonResponse;
-            ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
+            Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
             try {
-                jsonResponse = objectWriter.writeValueAsString(response);
-            } catch (JsonProcessingException e) {
+                jsonResponse = prettyGson.toJson(response);
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
 
