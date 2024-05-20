@@ -38,7 +38,7 @@ public class CoapDtlsServer {
     private final CoapService coapService;
 
     // Setup properties file
-    private static final File CONFIG_FILE = new File("Californium3SecureServer.properties");
+    private static final File CONFIG_FILE = new File("../coap-server-dtls-api/Californium3SecureServer.properties");
     private static final String CONFIG_HEADER = "Californium CoAP Properties file for Secure Server";
 
     // Add custom properties to default properties

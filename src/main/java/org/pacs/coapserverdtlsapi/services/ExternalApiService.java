@@ -1,6 +1,7 @@
 package org.pacs.coapserverdtlsapi.services;
 
 import org.pacs.coapserverdtlsapi.models.AccessResponseModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -10,8 +11,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class ExternalApiService {
     private final WebClient webClient;
 
-    public ExternalApiService() {
-        this.webClient = WebClient.builder()
+    @Autowired
+    public ExternalApiService(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder
                 .baseUrl("http://localhost:8086/access-control")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
