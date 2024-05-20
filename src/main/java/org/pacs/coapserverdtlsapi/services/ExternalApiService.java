@@ -14,7 +14,7 @@ public class ExternalApiService {
     @Autowired
     public ExternalApiService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder
-                .baseUrl("http://access-control-api/access-control")
+                .baseUrl("http://ACCESS-CONTROL-API/access-control")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
